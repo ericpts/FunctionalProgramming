@@ -1,0 +1,116 @@
+fmod MYINT is
+
+    including BOOL .
+
+    sort Int .
+
+    op 0 : -> Int [ctor] .
+    op s_ : Int -> Int [ctor] .
+    op p_ : Int -> Int [ctor] .
+
+    op _+_ : Int Int -> Int [assoc comm].
+    op _*_ : Int Int -> Int [assoc comm].
+    op _-_ : Int Int -> Int .
+
+    op _<_ : Int Int -> Bool .
+    op _>_ : Int Int -> Bool .
+    op _>=_ : Int Int -> Bool .
+    op _<=_ : Int Int -> Bool .
+
+    op min : Int Int -> Int .
+    op max : Int Int -> Int .
+
+    op par : Int -> Bool .
+    op impar : Int -> Bool .
+
+    op cmmdc : Int Int -> Int .
+
+    vars N M : Int .
+
+    eq (s (p N)) = N .
+    eq (p (s N)) = N .
+
+    eq 0 + N = N .
+    eq (s N) + M = s (N + M) .
+    eq (p N) + M = p (N + M) .
+
+    eq N - 0 = N .
+    eq 0 - (s N) = p(0 - N) .
+    eq 0 - (p N) = s(0 - N) .
+    eq (s N) - M = s(N - M) .
+    eq (p N) - M = p(N - M) .
+
+    eq 0 * N = 0 .
+    eq (s N) * M = (N * M) + M .
+    eq (p N) * M = (N * M) - M .
+
+    eq 0 < (s N) = true .
+    eq 0 < (p N) = false .
+
+    eq (s N) < (s M) = N < M .
+    eq (p N) < (p M) = N < M .
+    eq (s N) < (p M) = false .
+    eq (p N) < (s M) = true .
+
+    eq N <= M = (N < M) or (N == M) .
+    eq N >= M = not (N < M) .
+    eq N > M = not (N <= M) .
+
+    eq min (0, (p N)) = p N .
+    eq min (0, N) = 0 .
+    eq min ((s N), (s M)) = s (min(N, M)) .
+    eq min ((p N), (p M)) = p (min(N, M)) .
+    eq min ((s N), (p M)) = (p M) .
+
+    eq par(0) = true .
+    eq par(s N) = not par(N) .
+    eq par(p N) = not par(N) .
+
+    eq impar(N) = not par(N) .
+
+    eq cmmdc (N, N) = N .
+    ceq cmmdc (N, M) = cmmdc(M, N) if M > N .
+    ceq cmmdc (N, M) = cmmdc (M, N - M) if N > M .
+endfm
+
+fmod COMPLEX is
+    including MYINT .
+    sort Complex .
+
+    op complex : Int Int -> Complex [ctor] .
+    op _+_ : Complex Complex -> Complex [assoc comm] .
+    op _*_ : Complex Complex -> Complex [assoc comm] .
+
+    vars Nr Ni Mr Mi : Int .
+
+    eq complex(Nr, Ni) + complex(Mr, Mi) = complex(Nr + Mr, Ni + Mi) .
+    eq complex(Nr, Ni) * complex(Mr, Mi) = complex((Nr * Mr) - (Ni * Mi),
+                                                   (Nr * Mi) + (Ni * Mr)) .
+endfm
+
+fmod DATA is
+    including INT .
+    including BOOL .
+
+    sort Data .
+
+    op data : Int Int Int -> Data [ctor] .
+    op valid_ : Data -> Bool .
+    op add : Int Data -> Data .
+    op normalize : Data -> Data .
+
+    var N : Int .
+    vars Zi Luna An : Int .
+
+    eq valid data(Zi, Luna, An) =
+        (1 <= Zi and Zi <= 30) and
+        (1 <= Luna and Luna <= 12) and
+        (1 <= An and An <= 2020) .
+
+    ceq normalize(data(Zi, Luna, An)) =
+        normalize(data(Zi - 30, Luna + 1, An)) if Zi > 30 .
+    ceq normalize(data(Zi, Luna, An)) =
+        normalize(data(Zi, Luna - 12, An + 1)) if Luna > 12 .
+
+    eq add(N, data(Zi, Luna, An)) = normalize(data(Zi + N, Luna, An)) .
+endfm

@@ -1,0 +1,62 @@
+fmod BTREE is
+    protecting INT .
+    protecting BOOL .
+    protecting LIST{Int} .
+
+    sort Tree .
+
+    op nil : -> Tree [ctor] .
+    op _ _ _ : Tree Int Tree -> Tree [ctor] .
+    op mirror : Tree -> Tree .
+
+    op search : Int Tree -> Bool .
+    op depth : Tree -> Int .
+
+    op SRD : Tree -> List{Int} .
+    op RSD : Tree -> List{Int} .
+    op SDR : Tree -> List{Int} .
+
+    op bt-insert-impl : Int Tree -> Tree .
+    op bt-insert : List{Int} Tree -> Tree .
+
+    op bt-sort : List{Int} -> List{Int} .
+
+    var Node : Tree .
+    vars Left Right : Tree .
+    vars X Mid : Int .
+
+    var Car : Int .
+    var Cdr L : List{Int} .
+
+    eq mirror(nil) = nil .
+    eq mirror(Left X Right) = mirror(Right) X mirror(Left) .
+
+    eq search(X, nil) = false .
+    ceq search(X, Left Mid Right) = true if X == Mid .
+    ceq search(X, Left Mid Right) = search(X, Left) if X < Mid .
+    ceq search(X, Left Mid Right) = search(X, Right) if X > Mid .
+
+    eq depth(nil) = 0 .
+    eq depth(Left Mid Right) = max(depth(Left), depth(Right)) + 1 .
+
+    eq SRD(nil) = nil .
+    eq SRD(Left Mid Right) = append(SRD(Left), Mid SRD(Right)) .
+
+    eq RSD(nil) = nil .
+    eq RSD(Left Mid Right) = append(Mid RSD(Left), RSD(Right)) .
+
+    eq SDR(nil) = nil .
+    eq SDR(Left Mid Right) = append(
+                                SDR(Left),
+                                append(SDR(Right), Mid)) .
+
+    eq bt-insert-impl(X, nil) = nil X nil .
+    ceq bt-insert-impl(X, Left Mid Right) = bt-insert-impl(X, Left) Mid Right if X < Mid .
+    ceq bt-insert-impl(X, Left Mid Right) = Left Mid bt-insert-impl(X, Right) if X > Mid .
+    ceq bt-insert-impl(X, Left Mid Right) = Left Mid Right if X == Mid .
+
+    eq bt-insert(nil, Node) = Node .
+    eq bt-insert(Car Cdr, Node) = bt-insert(Cdr, bt-insert-impl(Car, Node)) .
+
+    eq bt-sort(L) = SRD(bt-insert(L, nil)) .
+endfm

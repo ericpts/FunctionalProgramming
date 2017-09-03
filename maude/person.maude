@@ -1,0 +1,49 @@
+mod PERSON is
+
+including NAT . *** our previous module
+
+sort Person .
+sort State .
+
+op married : -> State [ctor] .
+op divorced : -> State [ctor] .
+op single : -> State [ctor] .
+op engaged : -> State [ctor] .
+op dead : -> State [ctor] .
+op programmer : -> State [ctor] .
+
+op person : State Nat -> Person [ctor] .
+
+var N : Nat .
+var S : State .
+
+rl [prog] :
+
+person (S, N) => person(programmer, N) .
+
+rl [birthday] :
+
+person (S, N) => person (S, N + s(0)) .
+
+rl [get-engaged] :
+
+person (single, N) => person (engaged, N) .
+
+rl [get-married] :
+
+person (engaged, N) => person (married, N) .
+
+rl [get-divorced] :
+
+person (married, N) => person (divorced, N) .
+
+rl [las-vegas] :
+
+person (S, N) => person (married, N) .
+
+rl [die] :
+
+person (S, N) => person (dead, N) .
+
+
+endm

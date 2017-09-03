@@ -1,0 +1,60 @@
+fmod MYLIST is
+    protecting INT .
+    protecting BOOL .
+
+    sorts NList List .
+
+    subsort Int < NList < List .
+
+    op nil : -> List [ctor] .
+    op _ _ : Int List -> NList [id: nil ctor] .
+    op _in_ : Int NList -> Bool .
+    op length : List -> Int .
+
+    op reverseImpl : List List -> List .
+    op reverse : List -> List .
+
+    op appendImpl : List List -> List .
+    op append : List List -> List .
+
+    op insertInSorted : Int List -> List .
+
+    op sortImpl : List List -> List .
+    op sort : List -> List .
+
+    op replace : Int Int List -> List .
+
+    op add : Int List -> List .
+
+    vars L R Cdr : List .
+    vars Car N X Y : Int .
+
+    eq length(nil) = 0 .
+    eq length(Car Cdr) = 1 + length (Cdr) .
+    eq N in nil = false .
+
+    eq reverseImpl(nil, L) = L .
+    eq reverseImpl(Car Cdr, L) = reverseImpl(Cdr, Car L) .
+
+    eq reverse(L) = reverseImpl(L, nil) .
+
+    eq appendImpl(Car Cdr, L) = appendImpl(Cdr, Car L) .
+    eq append(L, R) = appendImpl(reverse(L), R) .
+
+    eq insertInSorted(N, nil) = N .
+    ceq insertInSorted(N, Car Cdr) = N Car Cdr if N <= Car .
+    ceq insertInSorted(N, Car Cdr) = Car insertInSorted(N, Cdr) if N > Car .
+
+    eq sortImpl(nil, L) = L .
+    eq sortImpl(Car Cdr, L) = sortImpl(Cdr, insertInSorted(Car, L)) .
+
+    eq sort(L) = sortImpl(L, nil) .
+
+    eq replace(X, Y, nil) = nil .
+    eq replace(X, Y, X Cdr) = Y replace(X, Y, Cdr) .
+    eq replace(X, Y, Car Cdr) = Car replace(X, Y, Cdr) .
+
+    eq add(X, nil) = nil .
+    eq add(X, Car Cdr) = Car X add(X, Cdr) .
+endfm
+

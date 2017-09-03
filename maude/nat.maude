@@ -1,0 +1,28 @@
+fmod LIST is
+
+including INT . *** Intural numbers.
+
+sort List .
+
+op NIL : -> List [ctor] .
+op cons : Int List -> List [ctor] .
+op car : List -> Int .
+op cdr : List -> List .
+
+op mul2 : List -> List .
+op sum_negatif : List -> Int .
+
+var L : List .
+var N : Int .
+
+eq car(cons(N, L)) = N .
+eq cdr(cons(N, L)) = L .
+
+eq mul2(NIL) = NIL .
+eq mul2(cons(N, L)) = cons(2 * N, mul2(L)) .
+
+eq sum_negatif(NIL) = 0 .
+ceq sum_negatif(cons(N, L)) = N + sum_negatif(L) if N < 0 .
+ceq sum_negatif(cons(N, L)) = sum_negatif(L) if N > 0 .
+
+endfm
