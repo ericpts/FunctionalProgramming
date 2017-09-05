@@ -2,8 +2,21 @@ import           Control.Exception.Base (assert)
 import           LibJSON
 import           Test.QuickCheck
 
+genSafeChar :: Gen Char
+genSafeChar = elements ['a' .. 'z']
+
+genSafeString :: Gen String
+genSafeString = listOf genSafeChar
+
+newtype SafeString = SafeString {unwrapSafeString :: String}
+  deriving Show
+
+instance Arbitrary SafeString where
+  arbitrary = SafeString <$> genSafeString
+
 instance Arbitrary JValue where
   arbitrary = sized sizedJValue
+
 
 t0 = JNum 10
 t1 = JNum (-10)
@@ -35,7 +48,7 @@ sizedArbitraryJArray 0 = do
   val <- sizedJValue 0
   return $ JArray [val]
 sizedArbitraryJArray size = do
-    head <- arbitrary
+    head <- sizedJValue 0
     JArray array <- sizedArbitraryJArray (size - 1)
     return $ JArray (head : array)
 
@@ -43,12 +56,12 @@ sizedArbitraryJObject :: Int -> (Gen JValue)
 sizedArbitraryJObject 0 = do
   fieldName <- arbitrary
   val <- sizedJValue 0
-  return $ JObject [(fieldName, val)]
+  return $ JObject [(unwrapSafeString fieldName, val)]
 sizedArbitraryJObject size = do
     fieldName <- arbitrary
-    fieldValue <- arbitrary
+    fieldValue <- sizedJValue 0
     JObject array <- sizedArbitraryJObject (size - 1)
-    return $ JObject ((fieldName, fieldValue) : array)
+    return $ JObject ((unwrapSafeString fieldName, fieldValue) : array)
 
 testParseJSON :: JValue -> Bool
 testParseJSON jValue = (parseJSON (show jValue)) == jValue
