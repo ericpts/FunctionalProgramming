@@ -67,4 +67,4 @@ testParseJSON :: JValue -> Bool
 testParseJSON jValue = (parseJSON (show jValue)) == jValue
 
 main = do
-  quickCheck testParseJSON
+  quickCheck (withMaxSuccess 10000 testParseJSON)
